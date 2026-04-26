@@ -1,11 +1,12 @@
 package com.example.snaprecipe
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.material3.MaterialTheme
 import com.example.snaprecipe.ui.Screens.ResultScreen
+import com.example.snaprecipe.ui.theme.SnapRecipeTheme
 import com.example.snaprecipe.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
@@ -16,8 +17,19 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            MaterialTheme {
-                ResultScreen(resultText = viewModel.uiState)
+            SnapRecipeTheme(
+                darkTheme = true,
+                dynamicColor = false
+            ) {
+                ResultScreen(
+                    resultText = viewModel.uiState,
+                    onTakePhoto = {
+                        Toast.makeText(this, "Camera screen coming next", Toast.LENGTH_SHORT).show()
+                    },
+                    onUploadImage = {
+                        Toast.makeText(this, "Upload flow coming next", Toast.LENGTH_SHORT).show()
+                    }
+                )
             }
         }
     }
