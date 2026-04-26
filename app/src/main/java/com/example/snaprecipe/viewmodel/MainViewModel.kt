@@ -1,3 +1,13 @@
+package com.example.snaprecipe.viewmodel
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.snaprecipe.data.repository.RecipeRepository
+import kotlinx.coroutines.launch
+
 class MainViewModel : ViewModel() {
 
     private val repository = RecipeRepository()

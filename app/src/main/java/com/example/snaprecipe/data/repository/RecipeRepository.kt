@@ -1,3 +1,10 @@
+package com.example.snaprecipe.data.repository
+
+import com.example.snaprecipe.data.remote.RetrofitClient
+import com.example.snaprecipe.utils.Constants
+import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.RequestBody.Companion.toRequestBody
+
 class RecipeRepository {
 
     suspend fun analyzeImage(base64Image: String): String {
