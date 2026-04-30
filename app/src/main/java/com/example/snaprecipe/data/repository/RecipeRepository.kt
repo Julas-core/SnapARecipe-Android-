@@ -1,14 +1,16 @@
 package com.example.snaprecipe.data.repository
 
+import com.example.snaprecipe.data.model.RecipeCard
 import com.example.snaprecipe.data.remote.RetrofitClient
 import com.example.snaprecipe.utils.Constants
+import com.google.gson.Gson
 import com.google.gson.JsonParser
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.RequestBody.Companion.toRequestBody
 
 class RecipeRepository {
 
-    suspend fun analyzeImage(base64Image: String, language: String, languageCode: String): String {
+    suspend fun analyzeImage(base64Image: String, language: String, languageCode: String): RecipeCard {
 
         val json = """
         {
@@ -17,11 +19,18 @@ class RecipeRepository {
               {
                 "text": "
                 You are a professional chef. Respond only in $language ($languageCode).
+                Return ONLY valid JSON. Do not include markdown or extra text.
 
-1. Identify the dish
-2. List ingredients with exact quantities
-3. Provide clear step-by-step instructions
-4. Suggest 1 variation.
+                JSON format:
+                {
+                  "title": "string",
+                  "intro": "short intro string",
+                  "instructions": ["step 1", "step 2"],
+                  "nutrition": "short nutrition summary string",
+                  "tips": ["tip 1", "tip 2"],
+                  "servings": "servings string",
+                  "time": "time string"
+                }
 "
               },
               {
@@ -42,8 +51,15 @@ class RecipeRepository {
             body
         )
 
-        val payload = response.body()?.string() ?: return "No response"
-        return extractText(payload) ?: payload
+        if (!response.isSuccessful) {
+          val errorBody = response.errorBody()?.string()
+          throw IllegalStateException("API error ${response.code()}: ${errorBody ?: "Unknown error"}")
+        }
+
+        val payload = response.body()?.string() ?: throw IllegalStateException("Empty response body")
+        val modelText = extractText(payload) ?: throw IllegalStateException("Missing model text")
+        val jsonBlock = extractJsonBlock(modelText) ?: modelText
+        return Gson().fromJson(jsonBlock, RecipeCard::class.java)
     }
 
     private fun extractText(payload: String): String? {
@@ -64,5 +80,15 @@ class RecipeRepository {
         } catch (_: Exception) {
             null
         }
+    }
+
+    private fun extractJsonBlock(text: String): String? {
+      val start = text.indexOf('{')
+      val end = text.lastIndexOf('}')
+      if (start == -1 || end == -1 || end <= start) {
+        return null
+      }
+
+      return text.substring(start, end + 1)
     }
 }

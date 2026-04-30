@@ -43,12 +43,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import android.graphics.BitmapFactory
 import com.example.snaprecipe.R
+import com.example.snaprecipe.data.model.RecipeCard
 import com.example.snaprecipe.ui.model.RecipeLanguage
 
 @Composable
 fun ResultScreen(
 	resultText: String,
 	imageBytes: ByteArray?,
+	recipe: RecipeCard?,
 	modifier: Modifier = Modifier,
 	onTakePhoto: (RecipeLanguage) -> Unit = {},
 	onUploadImage: (RecipeLanguage) -> Unit = {},
@@ -316,7 +318,7 @@ fun ResultScreen(
 					}
 
 					val isError = resultText.startsWith("Error:")
-					if (resultText.isNotBlank() && resultText != "Idle") {
+					if (resultText.isNotBlank() && resultText != "Idle" && resultText != "Done") {
 						Spacer(modifier = Modifier.height(14.dp))
 						if (isError) {
 							Surface(
@@ -339,6 +341,122 @@ fun ResultScreen(
 								style = MaterialTheme.typography.bodyMedium,
 								textAlign = TextAlign.Center
 							)
+						}
+					}
+
+					if (recipe != null) {
+						Spacer(modifier = Modifier.height(16.dp))
+						Surface(
+							shape = RoundedCornerShape(18.dp),
+							color = Color(0xFF101B30),
+							modifier = Modifier.fillMaxWidth()
+						) {
+							Column(
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(16.dp)
+							) {
+								Text(
+									text = recipe.title,
+									color = Color(0xFFFFF4D4),
+									style = MaterialTheme.typography.titleLarge,
+									fontWeight = FontWeight.SemiBold,
+									textAlign = TextAlign.Center,
+									modifier = Modifier.fillMaxWidth()
+								)
+
+								if (recipe.intro.isNotBlank()) {
+									Spacer(modifier = Modifier.height(8.dp))
+									Text(
+										text = recipe.intro,
+										color = mutedText,
+										style = MaterialTheme.typography.bodyMedium,
+										textAlign = TextAlign.Center,
+										modifier = Modifier.fillMaxWidth()
+									)
+								}
+
+								Spacer(modifier = Modifier.height(12.dp))
+								Text(
+									text = "Instructions",
+									color = Color(0xFFFFC870),
+									style = MaterialTheme.typography.titleSmall,
+									fontWeight = FontWeight.Medium
+								)
+								recipe.instructions.forEachIndexed { index, step ->
+									Text(
+										text = "${index + 1}. $step",
+										color = Color(0xFFE7ECF9),
+										style = MaterialTheme.typography.bodyMedium,
+										modifier = Modifier.padding(top = 6.dp)
+									)
+								}
+
+								if (recipe.nutrition.isNotBlank()) {
+									Spacer(modifier = Modifier.height(12.dp))
+									Text(
+										text = "Nutrition",
+										color = Color(0xFFFFC870),
+										style = MaterialTheme.typography.titleSmall,
+										fontWeight = FontWeight.Medium
+									)
+									Text(
+										text = recipe.nutrition,
+										color = Color(0xFFE7ECF9),
+										style = MaterialTheme.typography.bodyMedium,
+										modifier = Modifier.padding(top = 6.dp)
+									)
+								}
+
+								if (recipe.tips.isNotEmpty()) {
+									Spacer(modifier = Modifier.height(12.dp))
+									Text(
+										text = "Tips",
+										color = Color(0xFFFFC870),
+										style = MaterialTheme.typography.titleSmall,
+										fontWeight = FontWeight.Medium
+									)
+									recipe.tips.forEach { tip ->
+										Text(
+											text = "• $tip",
+											color = Color(0xFFE7ECF9),
+											style = MaterialTheme.typography.bodyMedium,
+											modifier = Modifier.padding(top = 6.dp)
+										)
+									}
+								}
+
+								Spacer(modifier = Modifier.height(12.dp))
+								Row(
+									modifier = Modifier.fillMaxWidth(),
+									horizontalArrangement = Arrangement.SpaceBetween
+								) {
+									Column {
+										Text(
+											text = "Servings",
+											color = Color(0xFFFFC870),
+											style = MaterialTheme.typography.labelMedium
+										)
+										Text(
+											text = recipe.servings,
+											color = Color(0xFFE7ECF9),
+											style = MaterialTheme.typography.bodyMedium
+										)
+									}
+									Column(horizontalAlignment = Alignment.End) {
+										Text(
+											text = "Time",
+											color = Color(0xFFFFC870),
+											style = MaterialTheme.typography.labelMedium
+										)
+										Text(
+											text = recipe.time,
+											color = Color(0xFFE7ECF9),
+											style = MaterialTheme.typography.bodyMedium
+										)
+									}
+								}
+							}
 						}
 					}
 				}

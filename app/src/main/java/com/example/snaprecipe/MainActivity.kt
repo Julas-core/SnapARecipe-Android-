@@ -77,6 +77,7 @@ class MainActivity : ComponentActivity() {
                 ResultScreen(
                     resultText = viewModel.uiState,
                     imageBytes = selectedImageBytes,
+                    recipe = viewModel.recipe,
                     onTakePhoto = { language ->
                         val imageFile = cameraManager.createImageFile()
                         val imageUri = FileProvider.getUriForFile(
