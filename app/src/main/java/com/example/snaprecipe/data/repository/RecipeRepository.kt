@@ -17,21 +17,7 @@ class RecipeRepository {
           "contents": [{
             "parts": [
               {
-                "text": "
-                You are a professional chef. Respond only in $language ($languageCode).
-                Return ONLY valid JSON. Do not include markdown or extra text.
-
-                JSON format:
-                {
-                  "title": "string",
-                  "intro": "short intro string",
-                  "instructions": ["step 1", "step 2"],
-                  "nutrition": "short nutrition summary string",
-                  "tips": ["tip 1", "tip 2"],
-                  "servings": "servings string",
-                  "time": "time string"
-                }
-"
+                "text": "You are a professional chef. Respond only in $language ($languageCode).\nReturn ONLY valid JSON. Do not include markdown or extra text.\n\nJSON format:\n{\"title\":\"string\",\"intro\":\"short intro string\",\"instructions\":[\"step 1\",\"step 2\"],\"nutrition\":\"short nutrition summary string\",\"tips\":[\"tip 1\",\"tip 2\"],\"servings\":\"servings string\",\"time\":\"time string\"}"
               },
               {
                 "inline_data": {
