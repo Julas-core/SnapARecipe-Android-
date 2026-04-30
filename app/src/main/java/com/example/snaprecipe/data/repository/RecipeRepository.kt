@@ -7,7 +7,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 class RecipeRepository {
 
-    suspend fun analyzeImage(base64Image: String): String {
+    suspend fun analyzeImage(base64Image: String, language: String, languageCode: String): String {
 
         val json = """
         {
@@ -15,7 +15,7 @@ class RecipeRepository {
             "parts": [
               {
                 "text": "
-                You are a professional chef.
+                You are a professional chef. Respond only in $language ($languageCode).
 
 1. Identify the dish
 2. List ingredients with exact quantities

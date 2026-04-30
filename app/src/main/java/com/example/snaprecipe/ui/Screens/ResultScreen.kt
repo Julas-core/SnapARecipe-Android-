@@ -39,14 +39,15 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.snaprecipe.R
+import com.example.snaprecipe.ui.model.RecipeLanguage
 
 @Composable
 fun ResultScreen(
 	resultText: String,
 	modifier: Modifier = Modifier,
-	onTakePhoto: () -> Unit = {},
-	onUploadImage: () -> Unit = {}
-) {
+	onTakePhoto: (RecipeLanguage) -> Unit = {},
+	onUploadImage: (RecipeLanguage) -> Unit = {}
+ ) {
 	val background = Brush.verticalGradient(
 		colors = listOf(
 			Color(0xFF081939),
@@ -57,7 +58,13 @@ fun ResultScreen(
 	val brandColor = Color(0xFFF7A61A)
 	val cardColor = Color(0xFF162643)
 	val mutedText = Color(0xFFF1D99F)
-	val languages = listOf("English", "Swahili", "French", "Spanish")
+	val languages = listOf(
+		RecipeLanguage("English", "en"),
+		RecipeLanguage("Arabic", "ar"),
+		RecipeLanguage("Spanish", "es"),
+		RecipeLanguage("Tigrinya", "ti"),
+		RecipeLanguage("Amharic", "am")
+	)
 
 	var selectedLanguage by remember { mutableStateOf(languages.first()) }
 	var expanded by remember { mutableStateOf(false) }
@@ -183,7 +190,7 @@ fun ResultScreen(
 								modifier = Modifier.fillMaxWidth(),
 								horizontalArrangement = Arrangement.SpaceBetween
 							) {
-								Text(text = selectedLanguage)
+								Text(text = selectedLanguage.label)
 								Text(text = "v")
 							}
 						}
@@ -195,7 +202,7 @@ fun ResultScreen(
 						) {
 							languages.forEach { language ->
 								DropdownMenuItem(
-									text = { Text(language) },
+									text = { Text(language.label) },
 									onClick = {
 										selectedLanguage = language
 										expanded = false
@@ -208,7 +215,7 @@ fun ResultScreen(
 					Spacer(modifier = Modifier.height(16.dp))
 
 					Button(
-						onClick = onTakePhoto,
+						onClick = { onTakePhoto(selectedLanguage) },
 						modifier = Modifier.fillMaxWidth(),
 						colors = ButtonDefaults.buttonColors(
 							containerColor = Color(0xFFF4A609),
@@ -226,7 +233,7 @@ fun ResultScreen(
 					Spacer(modifier = Modifier.height(10.dp))
 
 					Button(
-						onClick = onUploadImage,
+						onClick = { onUploadImage(selectedLanguage) },
 						modifier = Modifier.fillMaxWidth(),
 						colors = ButtonDefaults.buttonColors(
 							containerColor = Color(0xFF9E4B13),
@@ -241,14 +248,31 @@ fun ResultScreen(
 						)
 					}
 
+					val isError = resultText.startsWith("Error:")
 					if (resultText.isNotBlank() && resultText != "Idle") {
 						Spacer(modifier = Modifier.height(14.dp))
-						Text(
-							text = resultText,
-							color = Color(0xFFE7ECF9),
-							style = MaterialTheme.typography.bodyMedium,
-							textAlign = TextAlign.Center
-						)
+						if (isError) {
+							Surface(
+								shape = RoundedCornerShape(12.dp),
+								color = Color(0xFF3B0F14),
+								modifier = Modifier.fillMaxWidth()
+							) {
+								Text(
+									text = resultText.removePrefix("Error: ").trim(),
+									color = Color(0xFFFFC9C9),
+									style = MaterialTheme.typography.bodyMedium,
+									textAlign = TextAlign.Center,
+									modifier = Modifier.padding(12.dp)
+								)
+							}
+						} else {
+							Text(
+								text = resultText,
+								color = Color(0xFFE7ECF9),
+								style = MaterialTheme.typography.bodyMedium,
+								textAlign = TextAlign.Center
+							)
+						}
 					}
 				}
 			}

@@ -15,16 +15,20 @@ class MainViewModel : ViewModel() {
     var uiState by mutableStateOf("Idle")
         private set
 
-    fun analyze(base64: String) {
+    fun analyze(base64: String, language: String, languageCode: String) {
         uiState = "Loading..."
 
         viewModelScope.launch {
             try {
-                val result = repository.analyzeImage(base64)
+                val result = repository.analyzeImage(base64, language, languageCode)
                 uiState = result
             } catch (e: Exception) {
                 uiState = "Error: ${e.message}"
             }
         }
+    }
+
+    fun setError(message: String) {
+        uiState = "Error: $message"
     }
 }
