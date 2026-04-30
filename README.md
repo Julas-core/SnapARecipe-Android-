@@ -18,7 +18,7 @@ An Android app that uses Ai to analyze food images and generate recipes.
 2. Add Api key in Constants.kt
 3. Run app
 
-## Build APK With GitHub Actions (No Android Studio)
+## Build APK With GitHub Actions =
 1. Push your code to GitHub.
 2. Open the repo on GitHub.
 3. Go to Actions > Android APK CI.

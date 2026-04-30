@@ -10,9 +10,13 @@ on:
 
 env:
   GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+  KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+  KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+  KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+  KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
 jobs:
-  build-debug-apk:
+  build-release-apk:
     runs-on: ubuntu-latest
     timeout-minutes: 30
 
@@ -39,12 +43,18 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x gradlew
 
-      - name: Build debug APK
-        run: ./gradlew assembleDebug --stacktrace
+      - name: Decode release keystore
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > ${{ github.workspace }}/release.jks
 
-      - name: Upload debug APK artifact
+      - name: Build release APK
+        env:
+          KEYSTORE_PATH: ${{ github.workspace }}/release.jks
+        run: ./gradlew assembleRelease --stacktrace
+
+      - name: Upload release APK artifact
         uses: actions/upload-artifact@v4
         with:
-          name: snaprecipe-debug-apk
-          path: app/build/outputs/apk/debug/app-debug.apk
+          name: snaprecipe-release-apk
+          path: app/build/outputs/apk/release/app-release.apk
           if-no-files-found: error
