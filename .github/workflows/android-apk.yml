@@ -8,6 +8,9 @@ on:
       - master
   pull_request:
 
+env:
+  GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+
 jobs:
   build-debug-apk:
     runs-on: ubuntu-latest
