@@ -1,6 +1,7 @@
 package com.example.snaprecipe.ui.Screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,21 +33,26 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import android.graphics.BitmapFactory
 import com.example.snaprecipe.R
 import com.example.snaprecipe.ui.model.RecipeLanguage
 
 @Composable
 fun ResultScreen(
 	resultText: String,
+	imageBytes: ByteArray?,
 	modifier: Modifier = Modifier,
 	onTakePhoto: (RecipeLanguage) -> Unit = {},
-	onUploadImage: (RecipeLanguage) -> Unit = {}
+	onUploadImage: (RecipeLanguage) -> Unit = {},
+	onGenerateRecipe: (RecipeLanguage) -> Unit = {}
  ) {
 	val background = Brush.verticalGradient(
 		colors = listOf(
@@ -68,6 +74,9 @@ fun ResultScreen(
 
 	var selectedLanguage by remember { mutableStateOf(languages.first()) }
 	var expanded by remember { mutableStateOf(false) }
+	val imageBitmap = remember(imageBytes) {
+		imageBytes?.let { BitmapFactory.decodeByteArray(it, 0, it.size)?.asImageBitmap() }
+	}
 
 	Box(
 		modifier = modifier
@@ -214,38 +223,96 @@ fun ResultScreen(
 
 					Spacer(modifier = Modifier.height(16.dp))
 
-					Button(
-						onClick = { onTakePhoto(selectedLanguage) },
-						modifier = Modifier.fillMaxWidth(),
-						colors = ButtonDefaults.buttonColors(
-							containerColor = Color(0xFFF4A609),
-							contentColor = Color(0xFF1D1200)
-						),
-						shape = RoundedCornerShape(10.dp)
-					) {
-						Text(
-							text = "Take a Photo",
-							fontWeight = FontWeight.SemiBold,
-							fontSize = 20.sp
-						)
-					}
+					if (imageBytes == null) {
+						Button(
+							onClick = { onTakePhoto(selectedLanguage) },
+							modifier = Modifier.fillMaxWidth(),
+							colors = ButtonDefaults.buttonColors(
+								containerColor = Color(0xFFF4A609),
+								contentColor = Color(0xFF1D1200)
+							),
+							shape = RoundedCornerShape(10.dp)
+						) {
+							Text(
+								text = "Take a Photo",
+								fontWeight = FontWeight.SemiBold,
+								fontSize = 20.sp
+							)
+						}
 
-					Spacer(modifier = Modifier.height(10.dp))
+						Spacer(modifier = Modifier.height(10.dp))
 
-					Button(
-						onClick = { onUploadImage(selectedLanguage) },
-						modifier = Modifier.fillMaxWidth(),
-						colors = ButtonDefaults.buttonColors(
-							containerColor = Color(0xFF9E4B13),
-							contentColor = Color(0xFFFFF5E8)
-						),
-						shape = RoundedCornerShape(10.dp)
-					) {
-						Text(
-							text = "Upload Image",
-							fontWeight = FontWeight.SemiBold,
-							fontSize = 20.sp
-						)
+						Button(
+							onClick = { onUploadImage(selectedLanguage) },
+							modifier = Modifier.fillMaxWidth(),
+							colors = ButtonDefaults.buttonColors(
+								containerColor = Color(0xFF9E4B13),
+								contentColor = Color(0xFFFFF5E8)
+							),
+							shape = RoundedCornerShape(10.dp)
+						) {
+							Text(
+								text = "Upload Image",
+								fontWeight = FontWeight.SemiBold,
+								fontSize = 20.sp
+							)
+						}
+					} else {
+						Surface(
+							shape = RoundedCornerShape(18.dp),
+							color = Color(0xFF0E1B33),
+							modifier = Modifier.fillMaxWidth()
+						) {
+							Column(
+								modifier = Modifier
+									.fillMaxWidth()
+									.padding(14.dp),
+								horizontalAlignment = Alignment.CenterHorizontally
+							) {
+								if (imageBitmap != null) {
+									Image(
+										bitmap = imageBitmap,
+										contentDescription = "Selected meal photo",
+										modifier = Modifier
+											.fillMaxWidth()
+											.height(210.dp)
+											.background(Color(0xFF0B1427), RoundedCornerShape(14.dp)),
+										contentScale = ContentScale.Crop
+									)
+								}
+
+								Spacer(modifier = Modifier.height(12.dp))
+								Text(
+									text = "Image Ready!",
+									color = Color(0xFFFFF4D4),
+									style = MaterialTheme.typography.titleMedium,
+									fontWeight = FontWeight.SemiBold
+								)
+								Text(
+									text = "Your photo is perfectly cropped and ready to be transformed into a delicious recipe.",
+									color = mutedText,
+									style = MaterialTheme.typography.bodyMedium,
+									textAlign = TextAlign.Center
+								)
+
+								Spacer(modifier = Modifier.height(12.dp))
+								Button(
+									onClick = { onGenerateRecipe(selectedLanguage) },
+									modifier = Modifier.fillMaxWidth(),
+									colors = ButtonDefaults.buttonColors(
+										containerColor = Color(0xFFF28C18),
+										contentColor = Color(0xFF1D1200)
+									),
+									shape = RoundedCornerShape(10.dp)
+								) {
+									Text(
+										text = "Generate Recipe",
+										fontWeight = FontWeight.SemiBold,
+										fontSize = 18.sp
+									)
+								}
+							}
+						}
 					}
 
 					val isError = resultText.startsWith("Error:")

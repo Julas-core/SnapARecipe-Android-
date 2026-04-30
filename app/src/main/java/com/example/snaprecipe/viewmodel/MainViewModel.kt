@@ -31,4 +31,8 @@ class MainViewModel : ViewModel() {
     fun setError(message: String) {
         uiState = "Error: $message"
     }
+
+    fun reset() {
+        uiState = "Idle"
+    }
 }

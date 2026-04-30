@@ -39,6 +39,9 @@ class MainActivity : ComponentActivity() {
 
     private val maxImageBytes = 15L * 1024 * 1024
 
+    private var selectedImageBytes by mutableStateOf<ByteArray?>(null)
+    private var selectedImageBase64 by mutableStateOf<String?>(null)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -53,7 +56,7 @@ class MainActivity : ComponentActivity() {
             ) { success ->
                 val targetUri = pendingCameraUri
                 if (success && targetUri != null) {
-                    handleImageUri(context, targetUri, pendingLanguage)
+                    handleImageUri(context, targetUri)
                 } else if (!success) {
                     viewModel.setError("Camera capture canceled")
                 }
@@ -63,7 +66,7 @@ class MainActivity : ComponentActivity() {
                 ActivityResultContracts.PickVisualMedia()
             ) { uri ->
                 if (uri != null) {
-                    handleImageUri(context, uri, pendingLanguage)
+                    handleImageUri(context, uri)
                 }
             }
 
@@ -73,6 +76,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 ResultScreen(
                     resultText = viewModel.uiState,
+                    imageBytes = selectedImageBytes,
                     onTakePhoto = { language ->
                         val imageFile = cameraManager.createImageFile()
                         val imageUri = FileProvider.getUriForFile(
@@ -89,13 +93,22 @@ class MainActivity : ComponentActivity() {
                         pickImageLauncher.launch(
                             PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
                         )
+                    },
+                    onGenerateRecipe = { language ->
+                        val base64 = selectedImageBase64
+                        if (base64.isNullOrBlank()) {
+                            viewModel.setError("Please choose an image first")
+                            return@ResultScreen
+                        }
+
+                        viewModel.analyze(base64, language.label, language.code)
                     }
                 )
             }
         }
     }
 
-    private fun handleImageUri(context: Context, uri: Uri, language: RecipeLanguage) {
+    private fun handleImageUri(context: Context, uri: Uri) {
         var imageSize = getImageSizeBytes(context, uri)
         var bytes: ByteArray? = null
         if (imageSize <= 0) {
@@ -124,7 +137,9 @@ class MainActivity : ComponentActivity() {
         }
 
         val base64 = Base64.encodeToString(bytes, Base64.NO_WRAP)
-        viewModel.analyze(base64, language.label, language.code)
+        selectedImageBytes = bytes
+        selectedImageBase64 = base64
+        viewModel.reset()
     }
 
     private fun getImageSizeBytes(context: Context, uri: Uri): Long {
