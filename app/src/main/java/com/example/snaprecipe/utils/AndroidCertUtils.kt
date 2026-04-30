@@ -15,7 +15,7 @@ object AndroidCertUtils {
                     packageName,
                     PackageManager.GET_SIGNING_CERTIFICATES
                 )
-                info.signingInfo.apkContentsSigners
+                info.signingInfo?.apkContentsSigners
             } else {
                 val info = context.packageManager.getPackageInfo(
                     packageName,
@@ -25,7 +25,7 @@ object AndroidCertUtils {
                 info.signatures
             }
 
-            if (signatures.isEmpty()) {
+            if (signatures == null || signatures.isEmpty()) {
                 return ""
             }
 
