@@ -33,6 +33,8 @@ class RecipeRepository {
         val body = json.toRequestBody("application/json".toMediaType())
 
         val response = RetrofitClient.api.analyzeImage(
+            Constants.GEMINI_API_VERSION,
+            Constants.GEMINI_MODEL,
             Constants.API_KEY,
             body
         )
