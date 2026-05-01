@@ -37,7 +37,7 @@ class MainActivity : ComponentActivity() {
 
     private val viewModel: MainViewModel by viewModels()
 
-    private val maxImageBytes = 15L * 1024 * 1024
+    private val maxImageBytes = 5L * 1024 * 1024
 
     private var selectedImageBytes by mutableStateOf<ByteArray?>(null)
     private var selectedImageBase64 by mutableStateOf<String?>(null)
@@ -124,7 +124,7 @@ class MainActivity : ComponentActivity() {
         if (imageSize > maxImageBytes) {
             bytes = compressImage(context, uri, imageSize)
             if (bytes == null || bytes.size > maxImageBytes) {
-                viewModel.setError("Image must be 15 MB or smaller")
+                viewModel.setError("Image must be 5 MB or smaller")
                 return
             }
         }
